@@ -1,15 +1,28 @@
+import { subscribe } from './../hooks/pubsub.js';
+
 const renderNotifications = (username) => {
   const notificationsContainer = document.getElementById('notifications');
-  const todos = JSON.parse(localStorage.getItem(`${username}-todos`)) || [];
+  if (!notificationsContainer) {
+    console.error("Notifications container not found");
+    return;
+  }
 
-  const highPriorityTodos = todos.filter(todo => todo.priority === 'high' && !todo.completed);
+  const todos = JSON.parse(localStorage.getItem(`${username}-todos`)) || [];
+  const currentDate = new Date().toISOString().split('T')[0]; 
+  const overdueTodos = todos.filter(todo => todo.dueDate < currentDate && !todo.completed);
+  const completedTodos = todos.filter(todo => todo.completed);
 
   notificationsContainer.innerHTML = `
     <h2 class="text-xl font-bold mb-4">Notifications</h2>
     <ul class="space-y-2">
-      ${highPriorityTodos.map(todo => `
-        <li class="text-red-500">
-          ${todo.text}
+      ${overdueTodos.map(todo => `
+        <li class="text-red-500 font-bold">
+          Overdue: ${todo.text}
+        </li>
+      `).join('')}
+      ${completedTodos.map(todo => `
+        <li class="text-gray-500 line-through">
+          Completed: ${todo.text}
         </li>
       `).join('')}
     </ul>
@@ -17,3 +30,5 @@ const renderNotifications = (username) => {
 };
 
 export default renderNotifications;
+
+subscribe('tasksUpdated', () => renderNotifications(username));
