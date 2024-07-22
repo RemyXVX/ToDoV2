@@ -1,3 +1,5 @@
+import renderUserPage from "../../user/userPage.js";
+
 const renderLoginForm = () => {
   const formContainer = document.getElementById("form-container");
   formContainer.innerHTML = `
@@ -23,8 +25,8 @@ const renderLoginForm = () => {
 
     const storedUser = JSON.parse(localStorage.getItem(username));
     if (storedUser && storedUser.password === password) {
-    displayError("login-error", "");
-      // Redirect to userpage
+      displayError("login-error", "");
+      renderUserPage(username);
     } else {
       displayError("login-error", "Invalid username or password");
     }

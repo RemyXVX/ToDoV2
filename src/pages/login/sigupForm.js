@@ -1,3 +1,5 @@
+import renderUserPage from "../../user/userPage.js";
+
 const renderSignupForm = () => {
   const formContainer = document.getElementById('form-container');
   formContainer.innerHTML = `
@@ -35,7 +37,7 @@ const renderSignupForm = () => {
 
       localStorage.setItem(username, JSON.stringify({ password }));
       displayError("signup-error", "");
-      // Redirect to userpage
+      renderUserPage(username);
   });
 };
 
