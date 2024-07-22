@@ -1,3 +1,5 @@
+import renderLoginPage from "../pages/login/login.js"
+
 const renderNavigationBar = () => {
   const navigationBar = document.getElementById('navigationBar');
   navigationBar.innerHTML = `
@@ -12,9 +14,9 @@ const renderNavigationBar = () => {
   document.getElementById('nav-home').addEventListener('click', () => {
     renderHome();
   });
-
-  document.getElementById('nav-login').addEventListener('click', () => {
-    renderLoginForm();
+  document.getElementById('nav-login').addEventListener('click', (event) => {
+    event.preventDefault();
+    renderLoginPage();
   });
 };
 
