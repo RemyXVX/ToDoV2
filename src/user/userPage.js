@@ -1,5 +1,5 @@
 import renderTodoList from "../components/list.js";
-import renderCalender from "../components/calander.js";
+import renderCalender from "../components/calender.js";
 import renderNotifications from "../components/notification.js";
 
 const renderUserPage = (username) => {
