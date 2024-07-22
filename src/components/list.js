@@ -1,3 +1,5 @@
+import { publish } from "../hooks/pubsub.js";
+
 const renderToDoList = (username) => {
   const todoListContainer = document.getElementById("todo-list");
   if (!todoListContainer) {
@@ -45,7 +47,6 @@ const renderToDoList = (username) => {
       </form>
     `;
 
-    // Attach event listener after rendering
     const form = document.getElementById("add-todo-form");
     if (form) {
       form.addEventListener("submit", (e) => {
@@ -61,10 +62,16 @@ const renderToDoList = (username) => {
     }
   };
 
+  const updateTasksAndRedraw = () => {
+    localStorage.setItem(`${username}-todos`, JSON.stringify(todos));
+    renderTodos();
+    publish('tasksUpdated', todos);
+  };
+
   const addTodo = (text, dueDate) => {
     todos.push({ text, dueDate, completed: false, details: '', editing: false, creationDate: new Date().toISOString().split('T')[0] });
     localStorage.setItem(`${username}-todos`, JSON.stringify(todos));
-    renderTodos();
+    updateTasksAndRedraw();
   };
 
   const toggleComplete = (index) => {
@@ -88,17 +95,14 @@ const renderToDoList = (username) => {
   const saveEdit = (index) => {
     const newText = document.getElementById(`edit-text-${index}`).value.trim();
     const newDetails = document.getElementById(`edit-details-${index}`).value.trim();
+    const newDueDate = document.getElementById(`edit-due-date-${index}`).value;
 
-    if (newText) {
-      todos[index].text = newText;
-    }
-    if (newDetails) {
-      todos[index].details = newDetails;
-    }
-    
+    if (newText) todos[index].text = newText;
+    if (newDetails) todos[index].details = newDetails;
+    if (newDueDate) todos[index].dueDate = newDueDate;
+
     todos[index].editing = false;
-    localStorage.setItem(`${username}-todos`, JSON.stringify(todos));
-    renderTodos();
+    updateTasksAndRedraw();
   };
 
   const cancelEdit = (index) => {
@@ -107,7 +111,6 @@ const renderToDoList = (username) => {
     renderTodos();
   };
 
-  // Expose functions to global scope
   window.toggleComplete = toggleComplete;
   window.deleteTodo = deleteTodo;
   window.toggleEdit = toggleEdit;
