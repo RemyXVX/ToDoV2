@@ -16,7 +16,10 @@ const renderToDoList = (username) => {
             <div class="flex items-center justify-between">
               <div>
                 <span class="${todo.completed ? 'line-through text-gray-400' : ''}" id="todo-text-${index}">${todo.text}</span>
+                <p class="text-sm text-gray-500">Created: ${todo.creationDate}</p>
+                <p class="text-sm text-gray-500">Due: ${todo.dueDate || 'Not set'}</p>
                 ${todo.editing ? `
+                  <input type="date" value="${todo.dueDate}" id="edit-due-date-${index}" class="p-2 border border-gray-300 rounded mt-2">
                   <input type="text" value="${todo.text}" id="edit-text-${index}" class="p-2 border border-gray-300 rounded mt-2">
                   <textarea id="edit-details-${index}" class="p-2 border border-gray-300 rounded mt-2" rows="3">${todo.details}</textarea>
                   <div class="flex space-x-2 mt-2">
@@ -31,14 +34,13 @@ const renderToDoList = (username) => {
                 <button onclick="deleteTodo(${index})" class="px-2 py-1 bg-red-500 text-white rounded">Delete</button>
               </div>
             </div>
-            ${todo.details && !todo.editing ? `
-              <p class="mt-2 text-sm text-gray-600">Details: ${todo.details}</p>
-            ` : ''}
+            ${todo.details && !todo.editing ? `<p class="mt-2 text-sm text-gray-600">Details: ${todo.details}</p>` : ''}
           </li>
         `).join('')}
       </ul>
       <form id="add-todo-form" class="mt-4">
         <input type="text" id="new-task" class="p-2 border border-gray-300 rounded w-full" placeholder="New task">
+        <input type="date" id="new-due-date" class="p-2 border border-gray-300 rounded w-full mt-2" placeholder="Due date">
         <button type="submit" class="mt-2 p-2 bg-blue-500 text-white rounded">Add Task</button>
       </form>
     `;
@@ -49,16 +51,18 @@ const renderToDoList = (username) => {
       form.addEventListener("submit", (e) => {
         e.preventDefault();
         const text = document.getElementById("new-task").value;
+        const dueDate = document.getElementById("new-due-date").value;
         if (text) {
           addTodo(text);
           document.getElementById("new-task").value = "";
+          document.getElementById("new-due-date").value = "";
         }
       });
     }
   };
 
-  const addTodo = (text) => {
-    todos.push({ text, completed: false, details: '', editing: false });
+  const addTodo = (text, dueDate) => {
+    todos.push({ text, dueDate, completed: false, details: '', editing: false, creationDate: new Date().toISOString().split('T')[0] });
     localStorage.setItem(`${username}-todos`, JSON.stringify(todos));
     renderTodos();
   };
