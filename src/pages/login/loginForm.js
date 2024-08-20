@@ -1,4 +1,6 @@
 import renderUserPage from "../../user/userPage.js";
+import navigateTo from "../../hooks/route.js";
+import renderNavigationBar from "../../components/navigationBar.js"; // Make sure to import renderNavigationBar
 
 const renderLoginForm = () => {
   const formContainer = document.getElementById("form-container");
@@ -25,7 +27,14 @@ const renderLoginForm = () => {
 
     const storedUser = JSON.parse(localStorage.getItem(username));
     if (storedUser && storedUser.password === password) {
+
+      localStorage.setItem('currentUsername', username);
+
       displayError("login-error", "");
+
+      renderNavigationBar();
+      
+      navigateTo('userPage');
       renderUserPage(username);
     } else {
       displayError("login-error", "Invalid username or password");

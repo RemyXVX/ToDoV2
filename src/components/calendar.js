@@ -18,10 +18,6 @@ const renderCalendar = (username) => {
   });
 };
 
-const redrawCalendar = (username) => {
-  drawCalendar(username);
-};
-
 const setupCalendar = (username) => {
   const currentDate = new Date();
   currentMonth = currentDate.getMonth();

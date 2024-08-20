@@ -1,4 +1,5 @@
 import { publish } from "../hooks/pubsub.js";
+import taskOp from "./task/taskOp.js";
 
 const renderToDoList = (username) => {
   const todoListContainer = document.getElementById("todo-list");
@@ -7,117 +8,102 @@ const renderToDoList = (username) => {
     return;
   }
 
-  const todos = JSON.parse(localStorage.getItem(`${username}-todos`)) || [];
+  taskOp.todos = JSON.parse(localStorage.getItem(`${username}-todos`)) || [];
+  taskOp.archivedTodos = JSON.parse(localStorage.getItem(`${username}-archivedTodos`)) || [];
+
+  const updateTasksAndRedraw = () => {
+    localStorage.setItem(`${username}-todos`, JSON.stringify(taskOp.todos));
+    localStorage.setItem(`${username}-archivedTodos`, JSON.stringify(taskOp.archivedTodos));
+    renderTodos();
+    publish('tasksUpdated', taskOp.todos);
+  };
+
+  taskOp.setUpdateTasksAndRedrawCallback(updateTasksAndRedraw);
 
   const renderTodos = () => {
-    todoListContainer.innerHTML = `
-      <h2 class="text-2xl font-bold mb-4">To Do List</h2>
-      <ul class="space-y-2">
-        ${todos.map((todo, index) => `
-          <li class="flex flex-col space-y-2 border p-4 rounded-md">
-            <div class="flex items-center justify-between">
-              <div>
-                <span class="${todo.completed ? 'line-through text-gray-400' : ''}" id="todo-text-${index}">${todo.text}</span>
-                <p class="text-sm text-gray-500">Created: ${todo.creationDate}</p>
-                <p class="text-sm text-gray-500">Due: ${todo.dueDate || 'Not set'}</p>
-                ${todo.editing ? `
-                  <input type="date" value="${todo.dueDate}" id="edit-due-date-${index}" class="p-2 border border-gray-300 rounded mt-2">
-                  <input type="text" value="${todo.text}" id="edit-text-${index}" class="p-2 border border-gray-300 rounded mt-2">
-                  <textarea id="edit-details-${index}" class="p-2 border border-gray-300 rounded mt-2" rows="3">${todo.details}</textarea>
-                  <div class="flex space-x-2 mt-2">
-                    <button onclick="saveEdit(${index})" class="px-2 py-1 bg-blue-500 text-white rounded">Save</button>
-                    <button onclick="cancelEdit(${index})" class="px-2 py-1 bg-gray-500 text-white rounded">Cancel</button>
-                  </div>
-                ` : ''}
-              </div>
-              <div>
-                <button onclick="toggleComplete(${index})" class="px-2 py-1 ${todo.completed ? 'bg-gray-500' : 'bg-green-500'} text-white rounded">Complete</button>
-                <button onclick="toggleEdit(${index})" class="px-2 py-1 ${todo.editing ? 'bg-gray-500' : 'bg-yellow-500'} text-white rounded">${todo.editing ? 'Cancel Edit' : 'Edit'}</button>
-                <button onclick="deleteTodo(${index})" class="px-2 py-1 bg-red-500 text-white rounded">Delete</button>
-              </div>
-            </div>
-            ${todo.details && !todo.editing ? `<p class="mt-2 text-sm text-gray-600">Details: ${todo.details}</p>` : ''}
-          </li>
-        `).join('')}
-      </ul>
-      <form id="add-todo-form" class="mt-4">
-        <input type="text" id="new-task" class="p-2 border border-gray-300 rounded w-full" placeholder="New task">
-        <input type="date" id="new-due-date" class="p-2 border border-gray-300 rounded w-full mt-2" placeholder="Due date">
-        <button type="submit" class="mt-2 p-2 bg-blue-500 text-white rounded">Add Task</button>
-      </form>
-    `;
+    const recentTodos = taskOp.todos.sort((a, b) => new Date(b.creationDate) - new Date(a.creationDate)).slice(0, 3);
+    todoListContainer.innerHTML = '';
 
-    const form = document.getElementById("add-todo-form");
-    if (form) {
-      form.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const text = document.getElementById("new-task").value;
-        const dueDate = document.getElementById("new-due-date").value;
-        if (text) {
-          addTodo(text);
-          document.getElementById("new-task").value = "";
-          document.getElementById("new-due-date").value = "";
-        }
+    const header = document.createElement('h2');
+    header.className = 'text-2xl font-bold mb-4';
+    header.textContent = 'Add New Task';
+    todoListContainer.appendChild(header);
+
+    const form = document.createElement('form');
+    form.id = 'add-todo-form';
+    form.className = 'mb-8';
+    form.innerHTML = `
+      <input type="text" id="new-task" class="p-2 border border-gray-300 rounded w-full" placeholder="New task" required>
+      <input type="date" id="new-due-date" class="p-2 border border-gray-300 rounded w-full mt-2" placeholder="Due date" required>
+      <button type="submit" class="mt-2 p-2 bg-blue-500 text-white rounded">Add Task</button>
+    `;
+    todoListContainer.appendChild(form);
+
+    const taskListHeader = document.createElement('h2');
+    taskListHeader.className = 'text-2xl font-bold mb-4';
+    taskListHeader.textContent = 'Recent Tasks';
+    todoListContainer.appendChild(taskListHeader);
+
+    const taskList = document.createElement('ul');
+    taskList.className = 'space-y-2';
+    todoListContainer.appendChild(taskList);
+
+    recentTodos.forEach((todo, index) => {
+      const li = document.createElement('li');
+      li.className = 'flex flex-col space-y-2 border p-4 rounded-md';
+      taskList.appendChild(li);
+
+      const div = document.createElement('div');
+      div.className = 'flex items-center justify-between';
+      li.appendChild(div);
+
+      const textDiv = document.createElement('div');
+      textDiv.className = 'flex-grow';
+      div.appendChild(textDiv);
+
+      const span = document.createElement('span');
+      span.className = todo.completed ? 'line-through text-gray-400 font-bold' : 'font-bold';
+      span.id = `todo-text-${index}`;
+      span.textContent = todo.text;
+      textDiv.appendChild(span);
+
+      ['details', 'creationDate', 'dueDate'].forEach(key => {
+        const p = document.createElement('p');
+        p.className = 'text-sm text-gray-500';
+        p.textContent = `${key.replace(/([A-Z])/g, ' $1')}: ${todo[key] || 'Not set'}`;
+        textDiv.appendChild(p);
       });
+
+      if (todo.editing) {
+        textDiv.innerHTML += taskOp.renderEditingFields(todo, index);
+      } else {
+        textDiv.innerHTML += taskOp.renderTaskControls(todo, index);
+      }
+
+      if (!todo.editing) {
+        const archiveButton = document.createElement('button');
+        archiveButton.className = 'px-2 py-1 bg-blue-500 text-white rounded self-start md:self-center mt-2 md:mt-0';
+        archiveButton.textContent = 'Archive';
+        archiveButton.onclick = () => taskOp.archiveTask(index);
+        div.appendChild(archiveButton);
+      }
+    });
+
+    form.onsubmit = handleFormSubmit;
+  };
+
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    const text = document.getElementById("new-task").value;
+    const dueDate = document.getElementById("new-due-date").value;
+    if (text && dueDate) {
+      taskOp.addTodo(text, dueDate);
+      document.getElementById("new-task").value = '';
+      document.getElementById("new-due-date").value = '';
     }
   };
 
-  const updateTasksAndRedraw = () => {
-    localStorage.setItem(`${username}-todos`, JSON.stringify(todos));
-    renderTodos();
-    publish('tasksUpdated', todos);
-  };
-
-  const addTodo = (text, dueDate) => {
-    todos.push({ text, dueDate, completed: false, details: '', editing: false, creationDate: new Date().toISOString().split('T')[0] });
-    localStorage.setItem(`${username}-todos`, JSON.stringify(todos));
-    updateTasksAndRedraw();
-  };
-
-  const toggleComplete = (index) => {
-    todos[index].completed = !todos[index].completed;
-    localStorage.setItem(`${username}-todos`, JSON.stringify(todos));
-    renderTodos();
-  };
-
-  const deleteTodo = (index) => {
-    todos.splice(index, 1);
-    localStorage.setItem(`${username}-todos`, JSON.stringify(todos));
-    renderTodos();
-  };
-
-  const toggleEdit = (index) => {
-    todos[index].editing = !todos[index].editing;
-    localStorage.setItem(`${username}-todos`, JSON.stringify(todos));
-    renderTodos();
-  };
-
-  const saveEdit = (index) => {
-    const newText = document.getElementById(`edit-text-${index}`).value.trim();
-    const newDetails = document.getElementById(`edit-details-${index}`).value.trim();
-    const newDueDate = document.getElementById(`edit-due-date-${index}`).value;
-
-    if (newText) todos[index].text = newText;
-    if (newDetails) todos[index].details = newDetails;
-    if (newDueDate) todos[index].dueDate = newDueDate;
-
-    todos[index].editing = false;
-    updateTasksAndRedraw();
-  };
-
-  const cancelEdit = (index) => {
-    todos[index].editing = false;
-    localStorage.setItem(`${username}-todos`, JSON.stringify(todos));
-    renderTodos();
-  };
-
-  window.toggleComplete = toggleComplete;
-  window.deleteTodo = deleteTodo;
-  window.toggleEdit = toggleEdit;
-  window.saveEdit = saveEdit;
-  window.cancelEdit = cancelEdit;
-
-  renderTodos();
+  updateTasksAndRedraw();
 };
 
 export default renderToDoList;

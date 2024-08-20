@@ -8,8 +8,7 @@ const renderNotifications = (username) => {
   }
 
   const todos = JSON.parse(localStorage.getItem(`${username}-todos`)) || [];
-  const currentDate = new Date().toISOString().split('T')[0]; 
-  const overdueTodos = todos.filter(todo => todo.dueDate < currentDate && !todo.completed);
+  const overdueTodos = todos.filter(todo => new Date(todo.dueDate) < new Date() && !todo.completed);
   const completedTodos = todos.filter(todo => todo.completed);
 
   notificationsContainer.innerHTML = `
@@ -27,8 +26,10 @@ const renderNotifications = (username) => {
       `).join('')}
     </ul>
   `;
+  
 };
+
+subscribe('tasksUpdated', (todos) => renderNotifications(localStorage.getItem('currentUsername')));
 
 export default renderNotifications;
 
-subscribe('tasksUpdated', () => renderNotifications(username));

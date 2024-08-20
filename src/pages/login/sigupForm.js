@@ -1,4 +1,6 @@
 import renderUserPage from "../../user/userPage.js";
+import navigateTo from "../../hooks/route.js";
+import renderNavigationBar from "../../components/navigationBar.js"; // Import renderNavigationBar
 
 const renderSignupForm = () => {
   const formContainer = document.getElementById('form-container');
@@ -36,7 +38,13 @@ const renderSignupForm = () => {
     }
 
     localStorage.setItem(username, JSON.stringify({ password }));
+
+    localStorage.setItem('currentUsername', username);
     displayError("signup-error", "");
+
+    renderNavigationBar();
+
+    navigateTo('userPage');
     renderUserPage(username);
   });
 };
