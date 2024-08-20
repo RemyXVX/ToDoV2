@@ -54,9 +54,21 @@ const taskOp = {
     }
   },
 
+  
   archiveTask(index) {
     if (this.todos[index]) {
-      this.archivedTodos.push(this.todos.splice(index, 1)[0]);
+      const task = this.todos.splice(index, 1)[0];
+      task.archivedDate = new Date().toISOString().split('T')[0];
+      this.archivedTodos.push(task);
+      this.updateTasksAndRedraw();
+    }
+  },
+
+  unarchiveTask(index) {
+    if (this.archivedTodos[index]) {
+      const task = this.archivedTodos.splice(index, 1)[0];
+      delete task.archivedDate;
+      this.todos.push(task);
       this.updateTasksAndRedraw();
     }
   },
