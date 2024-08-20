@@ -50,15 +50,15 @@ const renderToDoList = (username) => {
 
     recentTodos.forEach((todo, index) => {
       const li = document.createElement('li');
-      li.className = 'flex flex-col space-y-2 border p-4 rounded-md';
+      li.className = 'grid grid-cols-1 gap-2 border p-4 rounded-md';
       taskList.appendChild(li);
 
       const div = document.createElement('div');
-      div.className = 'flex items-center justify-between';
+      div.className = 'grid grid-cols-1 gap-2';
       li.appendChild(div);
 
       const textDiv = document.createElement('div');
-      textDiv.className = 'flex-grow';
+      textDiv.className = 'w-full';
       div.appendChild(textDiv);
 
       const span = document.createElement('span');
@@ -75,17 +75,9 @@ const renderToDoList = (username) => {
       });
 
       if (todo.editing) {
-        textDiv.innerHTML += taskOp.renderEditingFields(todo, index);
+        textDiv.appendChild(taskOp.renderEditingFields(todo, index));
       } else {
-        textDiv.innerHTML += taskOp.renderTaskControls(todo, index);
-      }
-
-      if (!todo.editing) {
-        const archiveButton = document.createElement('button');
-        archiveButton.className = 'px-2 py-1 bg-blue-500 text-white rounded self-start md:self-center mt-2 md:mt-0';
-        archiveButton.textContent = 'Archive';
-        archiveButton.onclick = () => taskOp.archiveTask(index);
-        div.appendChild(archiveButton);
+        textDiv.appendChild(taskOp.renderTaskControls(todo, index));
       }
     });
 

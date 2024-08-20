@@ -62,25 +62,85 @@ const taskOp = {
   },
 
   renderEditingFields(todo, index) {
-    return `
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
-        <input type="text" value="${todo.text}" id="edit-text-${index}" class="p-2 border border-gray-300 rounded w-full">
-        <input type="date" value="${todo.dueDate}" id="edit-due-date-${index}" class="p-2 border border-gray-300 rounded w-full">
-        <textarea id="edit-details-${index}" class="p-2 border border-gray-300 rounded w-full mt-2" rows="3">${todo.details}</textarea>
-        <div class="flex justify-end space-x-2 mt-2">
-          <button onclick="taskOp.saveEdit(${index}, document.getElementById('edit-text-${index}').value, document.getElementById('edit-details-${index}').value, document.getElementById('edit-due-date-${index}').value)" class="px-2 py-1 bg-blue-500 text-white rounded">Save</button>
-          <button onclick="taskOp.cancelEdit(${index})" class="px-2 py-1 bg-gray-500 text-white rounded">Cancel</button>
-        </div>
-      </div>
-    `;
+    const container = document.createElement('div');
+    container.className = 'flex flex-col space-y-2 mt-2';
+
+    const editText = document.createElement('input');
+    editText.type = 'text';
+    editText.value = todo.text;
+    editText.id = `edit-text-${index}`;
+    editText.className = 'p-2 border border-gray-300 rounded w-full';
+    container.appendChild(editText);
+
+    const editDueDate = document.createElement('input');
+    editDueDate.type = 'date';
+    editDueDate.value = todo.dueDate;
+    editDueDate.id = `edit-due-date-${index}`;
+    editDueDate.className = 'p-2 border border-gray-300 rounded w-full';
+    container.appendChild(editDueDate);
+
+    const editDetails = document.createElement('textarea');
+    editDetails.id = `edit-details-${index}`;
+    editDetails.className = 'p-2 border border-gray-300 rounded w-full';
+    editDetails.rows = 3;
+    editDetails.textContent = todo.details;
+    container.appendChild(editDetails);
+
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 mt-2';
+    container.appendChild(buttonContainer);
+
+    const saveButton = document.createElement('button');
+    saveButton.className = 'px-3 py-1 bg-blue-500 text-white rounded';
+    saveButton.textContent = 'Save';
+    saveButton.addEventListener('click', this.saveEdit.bind(this, index, editText.value, editDetails.value, editDueDate.value));
+    buttonContainer.appendChild(saveButton);
+
+    const cancelButton = document.createElement('button');
+    cancelButton.className = 'px-3 py-1 bg-gray-500 text-white rounded';
+    cancelButton.textContent = 'Cancel';
+    cancelButton.addEventListener('click', this.cancelEdit.bind(this, index));
+    buttonContainer.appendChild(cancelButton);
+
+    return container;
   },
 
   renderTaskControls(todo, index) {
-    return `
-      <button onclick="taskOp.toggleEdit(${index})" class="px-2 py-1 bg-yellow-500 text-white rounded">Edit</button>
-      <button onclick="taskOp.deleteTodo(${index})" class="px-2 py-1 bg-red-500 text-white rounded">Delete</button>
-      <button onclick="taskOp.toggleComplete(${index})" class="px-2 py-1 ${todo.completed ? 'bg-gray-500' : 'bg-green-500'} text-white rounded">${todo.completed ? 'Undo Complete' : 'Complete'}</button>
-    `;
+    const container = document.createElement('div');
+    container.className = 'flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2';
+
+    if (!todo.completed) {
+      const editButton = document.createElement('button');
+      editButton.className = 'px-3 py-1 bg-yellow-500 text-white rounded';
+      editButton.textContent = 'Edit';
+      editButton.addEventListener('click', this.toggleEdit.bind(this, index));
+      container.appendChild(editButton);
+
+      const deleteButton = document.createElement('button');
+      deleteButton.className = 'px-3 py-1 bg-red-500 text-white rounded';
+      deleteButton.textContent = 'Delete';
+      deleteButton.addEventListener('click', this.deleteTodo.bind(this, index));
+      container.appendChild(deleteButton);
+    }
+
+    const completeButton = document.createElement('button');
+    completeButton.className = `px-3 py-1 ${todo.completed ? 'bg-gray-500' : 'bg-green-500'} text-white rounded`;
+    completeButton.textContent = todo.completed ? 'Undo' : 'Complete';
+    completeButton.addEventListener('click', () => {
+      this.toggleComplete(index);
+      this.updateTasksAndRedraw();
+    });
+    container.appendChild(completeButton);
+
+    if (todo.completed) {
+      const archiveButton = document.createElement('button');
+      archiveButton.className = 'px-3 py-1 bg-blue-500 text-white rounded';
+      archiveButton.textContent = 'Archive';
+      archiveButton.onclick = () => this.archiveTask(index);
+      container.appendChild(archiveButton);
+    }
+
+    return container;
   }
 };
 
