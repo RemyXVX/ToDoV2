@@ -11,7 +11,8 @@ const taskOp = {
   },
 
   addTodo(text, dueDate) {
-    this.todos.push({ text, dueDate, completed: false, details: '', editing: false, creationDate: new Date().toISOString().split('T')[0] });
+    const uniqueId = `task-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    this.todos.push({ id: uniqueId, text, dueDate, completed: false, details: 'Details to come', editing: false, creationDate: this.formatDate(new Date()) });
     this.updateTasksAndRedraw();
   },
 
@@ -54,11 +55,10 @@ const taskOp = {
     }
   },
 
-  
   archiveTask(index) {
     if (this.todos[index]) {
       const task = this.todos.splice(index, 1)[0];
-      task.archivedDate = new Date().toISOString().split('T')[0];
+      task.archivedDate = this.formatDate(new Date());
       this.archivedTodos.push(task);
       this.updateTasksAndRedraw();
     }
@@ -80,19 +80,19 @@ const taskOp = {
     const editText = document.createElement('input');
     editText.type = 'text';
     editText.value = todo.text;
-    editText.id = `edit-text-${index}`;
+    editText.id = `edit-text-${todo.id}`;
     editText.className = 'p-2 border border-gray-300 rounded w-full';
     container.appendChild(editText);
 
     const editDueDate = document.createElement('input');
     editDueDate.type = 'date';
     editDueDate.value = todo.dueDate;
-    editDueDate.id = `edit-due-date-${index}`;
+    editDueDate.id = `edit-due-date-${todo.id}`;
     editDueDate.className = 'p-2 border border-gray-300 rounded w-full';
     container.appendChild(editDueDate);
 
     const editDetails = document.createElement('textarea');
-    editDetails.id = `edit-details-${index}`;
+    editDetails.id = `edit-details-${todo.id}`;
     editDetails.className = 'p-2 border border-gray-300 rounded w-full';
     editDetails.rows = 3;
     editDetails.textContent = todo.details;
@@ -153,6 +153,10 @@ const taskOp = {
     }
 
     return container;
+  },
+
+  formatDate(date) {
+    return date.toLocaleDateString('en-us', { month: 'numeric', day: 'numeric', year: 'numeric' });
   }
 };
 

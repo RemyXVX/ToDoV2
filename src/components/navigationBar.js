@@ -2,6 +2,7 @@ import renderLoginPage from "../pages/login/login.js";
 import renderArchive from "../pages/archive/archive.js";
 import renderHomePage from "../pages/home/homePage.js";
 import renderUserPage from "../user/userPage.js";
+import renderUserTaskPage from "../user/userTaskPage.js"; 
 import navigateTo from "../hooks/route.js";
 
 const isLoggedIn = () => {
@@ -101,6 +102,13 @@ const renderNavigationBar = () => {
       event.preventDefault();
       logout();
     });
+
+    window.navigateToTaskPage = (username, dateStr, taskIndex) => {
+      localStorage.setItem('currentTaskDate', dateStr);
+      localStorage.setItem('currentTaskIndex', taskIndex);
+      navigateTo('userTaskPage');
+      renderUserTaskPage();
+    };
   } else {
     const loginLink = document.getElementById('nav-login');
     loginLink.addEventListener('click', (event) => {

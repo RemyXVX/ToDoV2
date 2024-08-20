@@ -1,5 +1,5 @@
 import { publish } from "../hooks/pubsub.js";
-import taskOp from "./task/taskOp.js";
+import taskOp from "./taskOp.js";
 
 const renderToDoList = (username) => {
   const todoListContainer = document.getElementById("todo-list");
@@ -63,14 +63,16 @@ const renderToDoList = (username) => {
 
       const span = document.createElement('span');
       span.className = todo.completed ? 'line-through text-gray-400 font-bold' : 'font-bold';
-      span.id = `todo-text-${index}`;
+      span.id = `todo-text-${todo.id}`;
       span.textContent = todo.text;
       textDiv.appendChild(span);
 
       ['details', 'creationDate', 'dueDate'].forEach(key => {
         const p = document.createElement('p');
         p.className = 'text-sm text-gray-500';
-        p.textContent = `${key.replace(/([A-Z])/g, ' $1')}: ${todo[key] || 'Not set'}`;
+        const formattedKey = key.charAt(0).toUpperCase() + key.slice(1).replace(/([A-Z])/g, ' $1');
+        const value = key === 'dueDate' || key === 'creationDate' ? taskOp.formatDate(new Date(todo[key])) : todo[key] || 'Details to come';
+        p.textContent = `${formattedKey}: ${value}`;
         textDiv.appendChild(p);
       });
 
@@ -87,7 +89,9 @@ const renderToDoList = (username) => {
   const handleFormSubmit = (e) => {
     e.preventDefault();
     const text = document.getElementById("new-task").value;
-    const dueDate = document.getElementById("new-due-date").value;
+    const dueDateInput = document.getElementById("new-due-date").value;
+    const dueDate = new Date(dueDateInput).toISOString().split('T')[0];
+    
     if (text && dueDate) {
       taskOp.addTodo(text, dueDate);
       document.getElementById("new-task").value = '';

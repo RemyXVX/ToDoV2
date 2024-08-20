@@ -1,5 +1,5 @@
 import { subscribe } from '../../hooks/pubsub.js';
-import taskOp from '../../components/task/taskOp.js';
+import taskOp from '../../components/taskOp.js';
 
 const renderArchive = (username) => {
   const archiveContainer = document.getElementById('archivePage');
