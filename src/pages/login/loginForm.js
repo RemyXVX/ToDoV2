@@ -1,13 +1,13 @@
 import renderUserPage from "../../user/userPage.js";
 import navigateTo from "../../hooks/route.js";
-import renderNavigationBar from "../../components/navigationBar.js"; // Make sure to import renderNavigationBar
+import renderNavigationBar from "../../components/navigationBar.js";
 
 const renderLoginForm = () => {
   const formContainer = document.getElementById("form-container");
   formContainer.innerHTML = `
       <form id="login-form" class="flex flex-col space-y-4">
-          <input type="text" id="login-username" placeholder="Username" class="p-2 border border-gray-300 rounded">
-          <input type="password" id="login-password" placeholder="Password" class="p-2 border border-gray-300 rounded">
+          <input type="text" id="login-username" placeholder="Username" autocomplete="Username" class="p-2 border border-gray-300 rounded">
+          <input type="password" id="login-password" placeholder="Password" autocomplete="Password" class="p-2 border border-gray-300 rounded">
           <div></div>
           <div id="login-error" class="text-red-500"></div>
           <button type="submit" class="p-2 bg-blue-500 text-white rounded">Login</button>

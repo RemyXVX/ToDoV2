@@ -24,6 +24,11 @@ const setupCalendar = (username) => {
   currentYear = currentDate.getFullYear();
 
   const calendarContainer = document.getElementById("calendar");
+  if (!calendarContainer) {
+    console.error("Failed to find calendar container during setup.");
+    return;
+  }
+
   calendarContainer.innerHTML = '';
 
   const headerDiv = document.createElement('div');
@@ -57,6 +62,8 @@ const setupCalendar = (username) => {
   tasksDiv.id = 'tasks-for-day';
   tasksDiv.className = 'mt-4';
   calendarContainer.appendChild(tasksDiv);
+
+  console.log('Calendar setup completed.');
 };
 
 const drawCalendar = (username) => {

@@ -1,7 +1,7 @@
 import taskOp from '../components/taskOp.js';
 
 const renderUserTaskPage = () => {
-  const taskId = localStorage.getItem('currentTaskId'); // Assuming taskId is now used to identify the task uniquely
+  const taskId = localStorage.getItem('currentTaskId');
   const username = localStorage.getItem('currentUsername');
   
   const tasks = JSON.parse(localStorage.getItem(`${username}-todos`)) || [];

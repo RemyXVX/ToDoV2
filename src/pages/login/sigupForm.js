@@ -1,13 +1,13 @@
 import renderUserPage from "../../user/userPage.js";
 import navigateTo from "../../hooks/route.js";
-import renderNavigationBar from "../../components/navigationBar.js"; // Import renderNavigationBar
+import renderNavigationBar from "../../components/navigationBar.js";
 
 const renderSignupForm = () => {
   const formContainer = document.getElementById('form-container');
   formContainer.innerHTML = `
     <form id="signup-form" class="flex flex-col space-y-4">
-      <input type="text" id="signup-username" placeholder="Username" class="p-2 border border-gray-300 rounded">
-      <input type="password" id="signup-password" placeholder="Password" class="p-2 border border-gray-300 rounded">
+      <input type="text" id="signup-username" placeholder="Username" autocomplete="none" class="p-2 border border-gray-300 rounded">
+      <input type="password" id="signup-password" placeholder="Password" autocomplete="none" class="p-2 border border-gray-300 rounded">
       <div id="password-strength" class="text-md"></div>
       <div id="signup-error" class="text-red-500"></div>
       <button type="submit" class="p-2 bg-blue-500 text-white rounded">Sign Up</button>
