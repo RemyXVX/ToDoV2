@@ -62,8 +62,6 @@ const setupCalendar = (username) => {
   tasksDiv.id = 'tasks-for-day';
   tasksDiv.className = 'mt-4';
   calendarContainer.appendChild(tasksDiv);
-
-  console.log('Calendar setup completed.');
 };
 
 const drawCalendar = (username) => {
@@ -88,7 +86,7 @@ const drawCalendar = (username) => {
 
   for (let day = 1; day <= daysInMonth; day++) {
     const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    const taskCount = tasks.filter(task => task.dueDate === dateStr).length;
+    const taskCount = getTasksForDay(username, dateStr).length;
     daysHTML += `
       <div class="text-center py-2 border rounded cursor-pointer hover:bg-blue-100" data-date="${dateStr}">
         ${day} ${taskCount > 0 ? `<span class="text-xs text-gray-600">(${taskCount} tasks)</span>` : ''}
@@ -113,6 +111,7 @@ const drawCalendar = (username) => {
 
 const showTasksForDay = (username, dateStr) => {
   const tasksForDay = getTasksForDay(username, dateStr);
+
   const tasksDiv = document.getElementById('tasks-for-day');
   
   if (!tasksDiv) {
@@ -120,7 +119,10 @@ const showTasksForDay = (username, dateStr) => {
     return;
   }
 
-  const formattedDate = new Date(dateStr).toLocaleDateString('en-us', { month: 'numeric', day: 'numeric', year: 'numeric' });
+  const dateParts = dateStr.split('-');
+  const localDate = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
+
+  const formattedDate = localDate.toLocaleDateString('en-us', { month: 'numeric', day: 'numeric', year: 'numeric' });
 
   if (tasksForDay.length > 0) {
     tasksDiv.innerHTML = `
