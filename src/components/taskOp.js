@@ -95,7 +95,7 @@ const taskOp = {
     editDetails.id = `edit-details-${todo.id}`;
     editDetails.className = 'p-2 border border-gray-300 rounded w-full';
     editDetails.rows = 3;
-    editDetails.textContent = todo.details;
+    editDetails.value = todo.details;
     container.appendChild(editDetails);
 
     const buttonContainer = document.createElement('div');
@@ -105,7 +105,12 @@ const taskOp = {
     const saveButton = document.createElement('button');
     saveButton.className = 'px-3 py-1 bg-blue-500 text-white rounded';
     saveButton.textContent = 'Save';
-    saveButton.addEventListener('click', this.saveEdit.bind(this, index, editText.value, editDetails.value, editDueDate.value));
+    saveButton.addEventListener('click', () => {
+      const updatedText = editText.value;
+      const updatedDetails = editDetails.value;
+      const updatedDueDate = editDueDate.value;
+      this.saveEdit(index, updatedText, updatedDetails, updatedDueDate);
+    });
     buttonContainer.appendChild(saveButton);
 
     const cancelButton = document.createElement('button');

@@ -74,7 +74,7 @@ const drawCalendar = (username) => {
   if (calendarHeader) {
     calendarHeader.textContent = headerDate;
   } else {
-    console.error("Calendar header not found");
+    // console.error("Calendar header not found");
     return;
   }
 
@@ -128,9 +128,9 @@ const showTasksForDay = (username, dateStr) => {
     tasksDiv.innerHTML = `
       <h3 class="text-lg font-bold mb-2">Tasks for ${formattedDate}:</h3>
       <ul class="list-disc list-inside">
-        ${tasksForDay.map((task, index) => `
-          <li><a href="#" class="text-blue-500 hover:underline" onclick="navigateToTaskPage('${username}', '${dateStr}', ${index})">${task.text} (Due: ${task.dueDate})</a></li>
-        `).join('')}
+      ${tasksForDay.map((task) => `
+        <li><a href="#" class="text-blue-500 hover:underline" onclick="navigateToTaskPage('${username}', '${dateStr}', '${String(task.id)}')">${task.text} (Due: ${task.dueDate})</a></li>
+      `).join('')}
       </ul>
     `;
   } else {
@@ -141,9 +141,10 @@ const showTasksForDay = (username, dateStr) => {
   }
 };
 
-window.navigateToTaskPage = (username, dateStr, taskIndex) => {
-  localStorage.setItem('currentTaskDate', dateStr);
-  localStorage.setItem('currentTaskIndex', taskIndex);
+window.navigateToTaskPage = (username, dateStr, taskId) => {
+  console.log("Navigating to task page with:", { taskId, username });
+  localStorage.setItem('currentTaskId', taskId);
+  localStorage.setItem('currentUsername', username);
   window.location.href = 'userTaskPage.html';
 };
 

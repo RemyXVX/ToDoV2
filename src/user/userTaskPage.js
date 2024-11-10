@@ -3,9 +3,23 @@ import taskOp from '../components/taskOp.js';
 const renderUserTaskPage = () => {
   const taskId = localStorage.getItem('currentTaskId');
   const username = localStorage.getItem('currentUsername');
-  
+
+  if (!taskId) {
+    console.error("No task ID found in localStorage.");
+    return;
+  }
+  if (!username) {
+    console.error("No username found in localStorage.");
+    return;
+  }
+
   const tasks = JSON.parse(localStorage.getItem(`${username}-todos`)) || [];
-  const task = tasks.find(t => t.id === taskId);
+  console.log('Retrieved tasks:', tasks);
+  console.log('Looking for task ID:', taskId);
+  console.log('Task ID type:', typeof taskId);
+  tasks.forEach(t => console.log('Available task ID:', t.id, 'type:', typeof t.id));
+
+  const task = tasks.find(t => String(t.id) === String(taskId));
 
   const taskContainer = document.getElementById('userTaskPage');
   if (!taskContainer) {
@@ -24,13 +38,20 @@ const renderUserTaskPage = () => {
       <p><strong>Creation Date:</strong> ${taskOp.formatDate(new Date(task.creationDate))}</p>
       <div id="task-controls"></div>
     `;
-    
+
     const controlsContainer = document.getElementById('task-controls');
     controlsContainer.appendChild(taskOp.renderTaskControls(task, tasks.indexOf(task)));
   } else {
+    console.error(`Task with ID ${taskId} not found for username: ${username}. Tasks available:`, tasks);
     taskContainer.innerHTML = '<p>Task not found.</p>';
-    console.error(`Task with ID ${taskId} not found.`);
   }
+};
+
+window.navigateToTaskPage = (username, dateStr, taskId) => {
+  console.log("Navigation triggered with:", { username, dateStr, taskId });
+  localStorage.setItem('currentTaskId', String(taskId));
+  localStorage.setItem('currentUsername', username);
+  window.location.href = 'userTaskPage.html';
 };
 
 export default renderUserTaskPage;

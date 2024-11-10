@@ -1,5 +1,5 @@
 import renderLoginForm from '../login/loginForm.js';
-import renderSignupForm from '../login/sigupForm.js'; 
+import renderSignupForm from './signupForm.js'; 
 
 const renderLoginPage = () => {
   const loginPage = document.getElementById('loginPage');

@@ -11,6 +11,8 @@ const isLoggedIn = () => {
 
 const logout = () => {
   localStorage.removeItem('currentUsername');
+  localStorage.removeItem('currentTaskId');
+  localStorage.removeItem('currentTaskDate');
   renderNavigationBar();
   navigateTo('homePage');
   renderHomePage();
@@ -103,9 +105,18 @@ const renderNavigationBar = () => {
       logout();
     });
 
-    window.navigateToTaskPage = (username, dateStr, taskIndex) => {
+    window.navigateToTaskPage = (username, dateStr, taskId) => {
+      console.log('Navigating to task:', { username, dateStr, taskId });
+      
+      if (!username || !taskId) {
+        console.error('Missing required navigation parameters:', { username, taskId });
+        return;
+      }
+
+      localStorage.setItem('currentUsername', username);
+      localStorage.setItem('currentTaskId', String(taskId));
       localStorage.setItem('currentTaskDate', dateStr);
-      localStorage.setItem('currentTaskIndex', taskIndex);
+
       navigateTo('userTaskPage');
       renderUserTaskPage();
     };
