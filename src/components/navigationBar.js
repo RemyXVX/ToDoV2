@@ -5,14 +5,29 @@ import renderUserPage from "../user/userPage.js";
 import renderUserTaskPage from "../user/userTaskPage.js"; 
 import navigateTo from "../hooks/route.js";
 
+const saveTaskContext = (username, taskId, taskDate) => {
+  if (username && taskId) {
+    localStorage.setItem('currentUsername', username);
+    localStorage.setItem('currentTaskId', String(taskId));
+    if (taskDate) {
+      localStorage.setItem('currentTaskDate', taskDate);
+    }
+  }
+};
+
+const clearTaskContext = () => {
+  sessionStorage.removeItem('currentTaskId');
+  sessionStorage.removeItem('currentTaskDate');
+};
+
 const isLoggedIn = () => {
   return localStorage.getItem('currentUsername') !== null;
 };
 
 const logout = () => {
   localStorage.removeItem('currentUsername');
-  localStorage.removeItem('currentTaskId');
-  localStorage.removeItem('currentTaskDate');
+  sessionStorage.clear();
+  clearTaskContext();
   renderNavigationBar();
   navigateTo('homePage');
   renderHomePage();
@@ -29,8 +44,17 @@ const renderNavigationBar = () => {
   container.className = 'container mx-auto p-4 flex justify-between items-center';
 
   const title = document.createElement('div');
-  title.className = 'text-white text-2xl font-bold';
+  title.className = 'text-white text-2xl font-bold cursor-pointer';
   title.textContent = 'ToDoList';
+  title.addEventListener('click', () => {
+    if (isLoggedIn()) {
+      navigateTo('userPage');
+      renderUserPage(localStorage.getItem('currentUsername'));
+    } else {
+      navigateTo('homePage');
+      renderHomePage();
+    }
+  });
 
   const ul = document.createElement('ul');
   ul.className = 'flex space-x-6';
@@ -75,16 +99,15 @@ const renderNavigationBar = () => {
 
   container.appendChild(title);
   container.appendChild(ul);
-
   nav.appendChild(container);
-
   navigationBar.appendChild(nav);
 
   homeLink.addEventListener('click', (event) => {
     event.preventDefault();
     if (isLoggedIn()) {
+      const username = localStorage.getItem('currentUsername');
       navigateTo('userPage');
-      renderUserPage(localStorage.getItem('currentUsername'));
+      renderUserPage(username);
     } else {
       navigateTo('homePage');
       renderHomePage();
@@ -95,8 +118,9 @@ const renderNavigationBar = () => {
     const archiveLink = document.getElementById('nav-archive');
     archiveLink.addEventListener('click', (event) => {
       event.preventDefault();
+      const username = localStorage.getItem('currentUsername');
       navigateTo('archivePage');
-      renderArchive(localStorage.getItem('currentUsername'));
+      renderArchive(username);
     });
 
     const logoutLink = document.getElementById('nav-logout');
@@ -106,19 +130,23 @@ const renderNavigationBar = () => {
     });
 
     window.navigateToTaskPage = (username, dateStr, taskId) => {
-      console.log('Navigating to task:', { username, dateStr, taskId });
-      
       if (!username || !taskId) {
         console.error('Missing required navigation parameters:', { username, taskId });
         return;
       }
 
       localStorage.setItem('currentUsername', username);
-      localStorage.setItem('currentTaskId', String(taskId));
-      localStorage.setItem('currentTaskDate', dateStr);
+      saveTaskContext(username, taskId, dateStr);
 
       navigateTo('userTaskPage');
       renderUserTaskPage();
+    };
+
+    window.handleBackToCalendar = () => {
+      const username = localStorage.getItem('currentUsername');
+      clearTaskContext();
+      navigateTo('userPage');
+      renderUserPage(username);
     };
   } else {
     const loginLink = document.getElementById('nav-login');
@@ -130,4 +158,16 @@ const renderNavigationBar = () => {
   }
 };
 
+const renderLoginStatus = () => {
+  const statusElement = document.getElementById('loginStatus');
+  if (isLoggedIn()) {
+    statusElement.textContent = 'Logged In';
+    statusElement.className = 'text-green-500';
+  } else {
+    statusElement.textContent = 'Logged Out';
+    statusElement.className = 'text-red-500';
+  }
+};
+
+export { saveTaskContext, clearTaskContext, renderLoginStatus };
 export default renderNavigationBar;

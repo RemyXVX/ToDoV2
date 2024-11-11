@@ -7,11 +7,21 @@ const taskOp = {
   },
 
   updateTasksAndRedraw() {
-    console.error('updateTasksAndRedraw is not defined');
+    if (this.updateTasksAndRedraw) {
+      this.updateTasksAndRedraw();
+    } else {
+      console.error('No updateTasksAndRedraw callback set');
+    }
   },
 
   addTodo(text, dueDate) {
-    const uniqueId = `task-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    const generateUUID = () => 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      const r = Math.random() * 16 | 0;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+    const uniqueId = generateUUID();
+    // `task-${Date.now()}-${Math.floor(Math.random() * 1000)}`; olds way of generating unique id
     this.todos.push({ id: uniqueId, text, dueDate, completed: false, details: 'Details to come', editing: false, creationDate: this.formatDate(new Date()) });
     this.updateTasksAndRedraw();
   },
