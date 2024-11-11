@@ -1,30 +1,66 @@
-# Basic Todo App
+# Todo App v2
 
-This is a simple todo app built using JavaScript, HTMX, and Tailwind CSS.
+This is a modern todo app built using JavaScript, Tailwind CSS, and Vite. The app allows users to manage their tasks efficiently with a clean and responsive user interface.
 
 ## Features
 
 - Add new tasks to your todo list
 - Mark tasks as completed
 - Delete tasks from the list
-
-## Installation
-
-1. Clone the repository to your local machine.
-2. Open the `index.html` file in your web browser.
-
-## Usage
-
-1. Enter a task in the input field and press Enter or click the "Add" button.
-2. To mark a task as completed, click the checkbox next to it.
-3. To delete a task, click the "Delete" button next to it.
+- User authentication (login/signup)
+- Task management with due dates and details
+- Archive completed tasks
+- Responsive design
 
 ## Technologies Used
 
 - JavaScript
-- HTMX
 - Tailwind CSS
+- Vite
+
+## Future Enhancements
+
+- Database integration (probably MySQL) to store tasks
+- Email verification for user sign-up
+- UI updates to scroll through tasks
+- Calendar drop-down option for selecting due dates
+- Name update to reflect the website domain
+
+## Getting Started
+
+Follow these steps to get the project up and running on your local machine:
+
+### Prerequisites
+
+- Node.js and npm installed on your machine
+
+### Installation
+
+1. **Clone the repository:**
+  ```
+   git clone <repository-link>
+  ```
+2. **Navigate to the project directory:**
+  ```
+   cd todo_v2
+  ````
+3. **Install dependencies:**
+  ```
+   npm install
+  ```
+4. **Run the development server:**
+  ```
+   npm run dev
+  ```
+5. **Open the app in your browser:**
+  ```
+   http://localhost:3000
+  ```
+
+## Future Instructions
+Instructions for setting up database integration and email verification will be added in the future.
 
 ## License
+this project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more information.
+
