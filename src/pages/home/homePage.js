@@ -1,3 +1,6 @@
+import navigateTo from '../../hooks/route.js';
+import renderLoginPage from '../login/login.js';
+
 const renderHomePage = () => {
   const mainContent = document.getElementById('homePage');
 
@@ -56,14 +59,16 @@ const renderHomePage = () => {
   loginButton.className = 'bg-green-500 hover:bg-green-600 text-white px-6 md:px-8 py-2 md:py-3 rounded-full font-bold text-lg mr-4 md:mr-6 shadow-lg';
   loginButton.textContent = 'Login';
   loginButton.addEventListener('click', () => {
-    navigateTo('/login');
+    navigateTo('loginPage');
+    renderLoginPage();
   });
 
   const signupButton = document.createElement('button');
   signupButton.className = 'bg-indigo-500 hover:bg-indigo-600 text-white px-6 md:px-8 py-2 md:py-3 rounded-full font-bold text-lg shadow-lg';
   signupButton.textContent = 'Sign Up';
   signupButton.addEventListener('click', () => {
-    navigateTo('/login');
+    navigateTo('loginPage');
+    renderLoginPage();
   });
 
   ctaSection.appendChild(loginButton);

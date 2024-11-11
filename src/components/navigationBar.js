@@ -20,9 +20,7 @@ const clearTaskContext = () => {
   sessionStorage.removeItem('currentTaskDate');
 };
 
-const isLoggedIn = () => {
-  return localStorage.getItem('currentUsername') !== null;
-};
+const isLoggedIn = () => localStorage.getItem('currentUsername') !== null;
 
 const logout = () => {
   localStorage.removeItem('currentUsername');
